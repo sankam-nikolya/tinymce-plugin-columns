@@ -5,7 +5,7 @@
     var plugin = this;
     plugin.editor = editor;
     plugin.url = url;
-    plugin.data = [];
+    plugin.data = {column:null,classes:[]};
 
 
     this.generalItems = [
@@ -35,12 +35,12 @@
           },
           {
             type: 'ListBox', 
-            name: 'width',  
+            name: 'xs-width',  
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-xs-'+width }
             })),
             onPostRender: function() {
-              var match = jQuery.grep(plugin.data, function(value) {
+              var match = jQuery.grep(plugin.data.classes, function(value) {
                 return value.indexOf("col-xs-") >= 0;
               });
               if(match.length > 0) {
@@ -50,12 +50,12 @@
           },
           {
             type: 'ListBox', 
-            name: 'offset',  
+            name: 'xs-offset',  
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-xs-offset'+width }
             })),
             onPostRender: function() {
-              var match = jQuery.grep(plugin.data, function(value) {
+              var match = jQuery.grep(plugin.data.classes, function(value) {
                 return value.indexOf("col-xs-offset-") >= 0;
               });
               if(match.length > 0) {
@@ -78,12 +78,12 @@
           },
           {
             type: 'ListBox', 
-            name: 'width',  
+            name: 'sm-width',  
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-sm-'+width }
             })),
             onPostRender: function() {
-              var match = jQuery.grep(plugin.data, function(value) {
+              var match = jQuery.grep(plugin.data.classes, function(value) {
                 return value.indexOf("col-sm-") >= 0;
               });
               if(match.length > 0) {
@@ -93,12 +93,12 @@
           },
           {
             type: 'ListBox', 
-            name: 'offset',  
+            name: 'sm-offset',  
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-sm-offset-'+width }
             })),
             onPostRender: function() {
-              var match = jQuery.grep(plugin.data, function(value) {
+              var match = jQuery.grep(plugin.data.classes, function(value) {
                 return value.indexOf("col-sm-offset-") >= 0;
               });
               if(match.length > 0) {
@@ -121,12 +121,12 @@
           },
           {
             type: 'ListBox', 
-            name: 'width',  
+            name: 'md-width',  
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-md-'+width }
             })),
             onPostRender: function() {
-              var match = jQuery.grep(plugin.data, function(value) {
+              var match = jQuery.grep(plugin.data.classes, function(value) {
                 return value.indexOf("col-md-") >= 0;
               });
               if(match.length > 0) {
@@ -136,12 +136,12 @@
           },
           {
             type: 'ListBox', 
-            name: 'offset',  
+            name: 'md-offset',  
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-md-offset-'+width }
             })),
             onPostRender: function() {
-              var match = jQuery.grep(plugin.data, function(value) {
+              var match = jQuery.grep(plugin.data.classes, function(value) {
                 return value.indexOf("col-md-offset-") >= 0;
               });
               if(match.length > 0) {
@@ -165,12 +165,12 @@
           },
           {
             type: 'ListBox', 
-            name: 'width',  
+            name: 'lg-width',  
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-lg-'+width }
             })),
             onPostRender: function() {
-              var match = jQuery.grep(plugin.data, function(value) {
+              var match = jQuery.grep(plugin.data.classes, function(value) {
                 return value.indexOf("col-lg-") >= 0;
               });
               if(match.length > 0) {
@@ -180,12 +180,12 @@
           },
           {
             type: 'ListBox', 
-            name: 'offset',  
+            name: 'lg-offset',  
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-lg-offset-'+width }
             })),
             onPostRender: function() {
-              var match = jQuery.grep(plugin.data, function(value) {
+              var match = jQuery.grep(plugin.data.classes, function(value) {
                 return value.indexOf("col-lg-offset-") >= 0;
               });
               if(match.length > 0) {
@@ -209,13 +209,37 @@
       body: this.generalItems,
 
       onsubmit: function(e) {
-        console.log("submitted");
+        var classes = [];
+
+        $(data.column).removeClass (function (index, className) {
+          return (className.match (/(^|\s)col-\S+/g) || []).join(' ');
+        });
+
+        $.each(e.data, function(type, value) {
+          if(value != "none") {
+            $(data.column).addClass(value);
+            classes.push(value);
+          }
+        })
+
+        data.classes = classes;
       }
     });
   }
 
-  function isRow(table) {
-    return true;
+  function isColumn(column) {
+    var parents = $(column).parents();
+    var check = false;
+
+    $.each(parents, function(index, parent) {
+      if($(parent).hasClass("row")) {
+        check = true;
+        return false;
+      }
+    })
+    if(check) {
+      return true;
+    }
   }
 
   Plugin.prototype.addToolbars = function() {
@@ -230,7 +254,7 @@
     }
 
     this.editor.addContextToolbar(
-      isRow,
+      isColumn,
       toolbarItems
     );
   }
@@ -243,10 +267,8 @@
         $.each(e.parents, function(index, parent){
           if(parent.nodeName === 'DIV') {   
             if($(e.parents[index+1]).hasClass('row')) {
-              console.log(plugin.data)
-              // this.data = $(parent).attr("class").split(" ");
-              // console.log(this.data)
-              plugin.data = $(parent).attr("class").split(" ");
+              plugin.data.classes = $(parent).attr("class").split(" ");
+              plugin.data.column = $(parent);
             }
           }
         })
@@ -255,8 +277,8 @@
 
     // Add a button that opens a window
     editor.addButton('bscolumns', {
-      text: 'Columns',
-      icon: false,
+      image: url + '/img/icons/columns-settings.svg',
+      tooltip: 'Edit Column Sizing',
       onclick: function() {
         // Open window
         plugin.showDialog();
