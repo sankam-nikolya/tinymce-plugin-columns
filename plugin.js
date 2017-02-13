@@ -1,12 +1,18 @@
 (function (tinymce) {
   'use strict'
 
+  function toolbarCheck(column) {
+    if($(column).hasClass("row")) {
+      return true;
+    }
+  }
+
   function Plugin (editor, url) {
     var plugin = this;
     plugin.editor = editor;
     plugin.url = url;
     plugin.data = {column:null,classes:[]};
-
+    var test = url + "/img/icons/column-settings.svg";
 
     this.generalItems = [
       {
@@ -31,11 +37,15 @@
         items: [
           {
             type: 'label', 
-            text: 'xs'
+            text: 'xs',
+            minWidth: 65,
+            minHeight: 23,
+            style: 'background-image: url('+url + "/img/icons/xs.svg"+'); background-repeat: no-repeat; background-position: right;'
           },
           {
             type: 'ListBox', 
             name: 'xs-width',  
+            minWidth: 65,
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-xs-'+width }
             })),
@@ -51,6 +61,7 @@
           {
             type: 'ListBox', 
             name: 'xs-offset',  
+            minWidth: 65,
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-xs-offset'+width }
             })),
@@ -74,11 +85,15 @@
         items: [
           {
             type: 'label', 
-            text: 'sm'
+            text: 'sm',
+            minWidth: 65,
+            minHeight: 23,
+            style: 'background-image: url('+url + "/img/icons/sm.svg"+'); background-repeat: no-repeat; background-position: right;'
           },
           {
             type: 'ListBox', 
             name: 'sm-width',  
+            minWidth: 65,
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-sm-'+width }
             })),
@@ -94,6 +109,7 @@
           {
             type: 'ListBox', 
             name: 'sm-offset',  
+            minWidth: 65,
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-sm-offset-'+width }
             })),
@@ -117,11 +133,15 @@
         items: [
           {
             type: 'label', 
-            text: 'md'
+            text: 'md',
+            minWidth: 65,
+            minHeight: 23,
+            style: 'background-image: url('+url + "/img/icons/md.svg"+'); background-repeat: no-repeat; background-position: right;'
           },
           {
             type: 'ListBox', 
             name: 'md-width',  
+            minWidth: 65,
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-md-'+width }
             })),
@@ -137,6 +157,7 @@
           {
             type: 'ListBox', 
             name: 'md-offset',  
+            minWidth: 65,
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-md-offset-'+width }
             })),
@@ -161,11 +182,15 @@
         items: [
           {
             type: 'label', 
-            text: 'lg'
+            text: 'lg',
+            minWidth: 65,
+            minHeight: 23,
+            style: 'background-image: url('+url + "/img/icons/lg.svg"+'); background-repeat: no-repeat; background-position: right;'
           },
           {
             type: 'ListBox', 
             name: 'lg-width',  
+            minWidth: 65,
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-lg-'+width }
             })),
@@ -181,6 +206,8 @@
           {
             type: 'ListBox', 
             name: 'lg-offset',  
+            minWidth: 65,
+
             values: [{text: 'None', value: 'none'}].concat([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (width) {
               return { text: width, value: 'col-lg-offset-'+width }
             })),
@@ -195,12 +222,13 @@
           }
         ]
       }
-    ]
+    ];
 
     this.init(editor, url);
   }
 
   Plugin.prototype.showDialog = function () {
+    var editor = this.editor;
     var data = this.data;
 
     this.editor.windowManager.open({
@@ -220,26 +248,12 @@
             $(data.column).addClass(value);
             classes.push(value);
           }
-        })
+        });
 
+        editor.undoManager.add();
         data.classes = classes;
       }
     });
-  }
-
-  function isColumn(column) {
-    var parents = $(column).parents();
-    var check = false;
-
-    $.each(parents, function(index, parent) {
-      if($(parent).hasClass("row")) {
-        check = true;
-        return false;
-      }
-    })
-    if(check) {
-      return true;
-    }
   }
 
   Plugin.prototype.addToolbars = function() {
@@ -254,34 +268,54 @@
     }
 
     this.editor.addContextToolbar(
-      isColumn,
+      toolbarCheck,
       toolbarItems
     );
   }
 
   Plugin.prototype.init = function (editor, url) {
-    var plugin = this
+    var plugin = this;
+    var button = null;
 
-    editor.on('NodeChange', function(e) {
-      if(e.selectionChange) {
-        $.each(e.parents, function(index, parent){
-          if(parent.nodeName === 'DIV') {   
-            if($(e.parents[index+1]).hasClass('row')) {
-              plugin.data.classes = $(parent).attr("class").split(" ");
-              plugin.data.column = $(parent);
-            }
-          }
-        })
-      }
-    });
 
     // Add a button that opens a window
     editor.addButton('bscolumns', {
-      image: url + '/img/icons/columns-settings.svg',
+      image: url + '/img/icons/column-settings.svg',
       tooltip: 'Edit Column Sizing',
       onclick: function() {
         // Open window
         plugin.showDialog();
+      }
+    });
+
+    editor.addMenuItem('bscolumns', {
+      image: url + '/img/icons/column-settings.svg',
+      text: 'Column',
+      onclick: function() {
+        plugin.showDialog();
+      },
+      context: 'tools',
+      onPostRender: function(){
+        button = this;
+        button.disabled(true);
+      }
+    });
+
+    editor.on('NodeChange', function(e) {
+      if(e.selectionChange) {
+        var buttonDisabled = true;
+
+        $.each(e.parents, function(index, parent){
+          if(parent.nodeName === 'DIV' && $(e.parents[index+1]).hasClass('row')) {   
+            plugin.data.classes = $(parent).attr("class").split(" ");
+            plugin.data.column = $(parent);
+            buttonDisabled = false;
+            return false;
+          } 
+        })
+        if(button) {
+          button.disabled(buttonDisabled);
+        }
       }
     });
 
@@ -290,7 +324,7 @@
 
   tinymce.create('tinymce.plugins.BSColumns', {
     init: function (editor, url) {
-      return new Plugin(editor, url)
+      return new Plugin(editor, url);
     },
     getInfo: function () {
       return {
@@ -300,8 +334,8 @@
         version: '0.1.0'
       }
     }
-  })
+  });
 
   // Register plugin
-  tinymce.PluginManager.add('bscolumns', tinymce.plugins.BSColumns)
+  tinymce.PluginManager.add('bscolumns', tinymce.plugins.BSColumns);
 })(window.tinymce)
