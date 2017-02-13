@@ -1,0 +1,34 @@
+{
+  "name": "tinymce-plugin-columns",
+  "version": "0.1.0",
+  "description": "Assists in adjusting bootstrap columns inserted in the TinyMCE editor.",
+  "main": "plugin.js",
+  "scripts": {
+    "build": "node_modules/.bin/uglifyjs --compress properties,dead_code --mangle --output plugin.min.js --source-map plugin.js.map plugin.js",
+    "git": "git add plugin.js.map plugin.min.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "pre-commit": [
+    "build",
+    "git"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrandExtract/tinymce-plugin-columns.git"
+  },
+  "keywords": [
+    "TinyMCE",
+    "plugin",
+    "bootstrap"
+  ],
+  "author": "BrandExtract",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BrandExtract/tinymce-plugin-columns/issues"
+  },
+  "homepage": "https://github.com/BrandExtract/tinymce-plugin-columns#readme",
+  "devDependencies": {
+    "pre-commit": "^1.2.2",
+    "uglify-js": "^2.7.5"
+  }
+}
